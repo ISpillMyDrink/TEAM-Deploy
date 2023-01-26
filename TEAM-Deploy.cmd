@@ -36,15 +36,15 @@ call :writeMenuHeader "Main Menu"
 call :writeMenuEntry "[A] Architecture: %arch%"              "[B] Bootloader: %bootType% / %partitionTable%"
 echo.
 call :writeMenuEntry "[I] Image:        %image%"             "[L] Drive:	  %driveName%"
-call :writeMenuEntry "[E] Edition:      %imageEdition%"
+call :writeMenuEntry "[E] Index:        %imageIndex%"
 call :writeMenuEntry ""                                      "[S] System:     %letterSystem%: %paddedSizeSystem:~-8%"
-call :writeMenuEntry "[U] Answerfile:  %answerfile%"        "    MSR:        -- %paddedSizeMSR:~-8%"
+call :writeMenuEntry "[U] Answerfile:   %answerfile%"        "    MSR:        -- %paddedSizeMSR:~-8%"
 call :writeMenuEntry "[F] Assocfile:    %associationfile%"   "[W] Windows:    %letterOS%:"
 call :writeMenuEntry ""                                      "[R] Recovery:   %letterRecovery%: %paddedSizeRecovery:~-8%"
 call :writeMenuEntry "[P] Provisioning: %package%"
 echo.
 echo.
-echo. [X] EXIT
+echo. [X] Exit
 echo.
 set instruction=
 set /P instruction=Please make a selection (enter space to start deployment): 
@@ -59,6 +59,7 @@ if /i "%instruction%" EQU "X" (
     )
 
     set imageID=X
+    set ImageIndex=X
     set answerID=X
     set assocID=X
 
@@ -66,14 +67,8 @@ if /i "%instruction%" EQU "X" (
     call :updateAnswerfileInfo
     call :updateAssociationfileInfo
 ) else if /i "%instruction%" EQU "E" (
-    if /i "%imageID%" NEQ "X" (
-        if "%imageEdition%" EQU "Windows 10 Home" (
-            set imageEdition=Windows 10 Education
-        ) else if "%imageEdition%" EQU "Windows 10 Education" (
-            set imageEdition=Windows 10 Pro
-        ) else (
-            set imageEdition=Windows 10 Home
-        )
+    if "%imageIndex%" NEQ "-------------" (
+        goto menuIndexSelection
     )
 ) else if /i "%instruction%" EQU "S" (
     goto menuSystemPartition
@@ -197,6 +192,7 @@ echo.
 echo.
 echo.
 echo Please enter the image number or ^<X^> to disable image deployment.
+set newImageID=%imageID%
 set /P newImageID=Image number (%imageID%):
 
 echo %newImageID%|findstr /r "[xX0-9]" > nul
@@ -204,6 +200,22 @@ if %errorlevel% EQU 1 goto menuImageSelection
 set imageID=%newImageID%
 
 call :updateImageInfo
+goto menuMain
+
+:menuIndexSelection
+cls
+call :writeMenuHeader "Index Selection"
+echo.
+dism /get-imageinfo /imagefile:"%imagepath%" 
+echo.
+echo Please enter the image index to deploy.
+set newImageIndex=%imageIndex%
+set /P newImageIndex=Index (%imageIndex%):
+
+echo %newImageIndex%|findstr /r "[1-9]" > nul
+if %errorlevel% EQU 1 goto menuIndexSelection
+set imageIndex=%newImageIndex%
+
 goto menuMain
 
 :menuAnswerfileSelection
@@ -215,7 +227,7 @@ for /l %%b in (1,1,%i%) do echo %%b. !answer[%%b]!
 echo.
 echo.
 echo.
-set /P newAnswerID=Please enter answerfile number (%answerID%) or ^<X^> to disable answerfile:
+set /P newAnswerID=Please enter answerfile number or ^<X^> to disable answerfile (%answerID%):
 
 echo %newAnswerID%|findstr /r "[xX0-9]" > nul
 if %errorlevel% EQU 1 goto menuAnswerfileSelection
@@ -233,7 +245,7 @@ for /l %%b in (1,1,%i%) do echo %%b. !assoc[%%b]!
 echo.
 echo.
 echo.
-set /P newAssocID=Please enter the association file number (%assocID%) or ^<X^> to disable association file:
+set /P newAssocID=Please enter the association file number or ^<X^> to disable association file (%assocID%):
 
 echo %newAssocID%|findstr /r "[xX0-9]" > nul
 if %errorlevel% EQU 1 goto menuAssociationfileSelection
@@ -266,7 +278,7 @@ goto menuMain
 cls
 call :writeMenuHeader "Deployment"
 if /i "%diskID%" NEQ "X" echo. Drive %driveName% will be formatted as %partitionTable%.
-if /i "%imageID%" NEQ "X" echo. Edition %imageEdition% from image %image% will be extracted to %letterOS%:\.
+if /i "%imageID%" NEQ "X" echo. Index %imageIndex% from image %image% will be extracted to %letterOS%:\.
 if /i "%bootType%" NEQ "----" echo. %bootType% bootloader will be created on %letterSystem%:\ with reference to %letterOS%:\Windows.
 if /i "%answerID%" NEQ "X" echo. The answerfile %answerfile% will be applied to %letterOS%:\.
 if /i "%assocID%" NEQ "X" echo. The associationfile %associationfile% will be applied to %letterOS%:\.
@@ -299,7 +311,7 @@ echo. Partitioning has finished.
 :continue
 echo.
 if /I "%imageID%" NEQ "X" (
-    echo. Extracting %imageEdition% edition from %image% Image to %letterOS%:\...
+    echo. Extracting index %imageIndex% from %image% Image to %letterOS%:\...
     echo.
     call :deployImage
     echo.
@@ -390,7 +402,7 @@ if %errorlevel% EQU 1 (
 exit /b
 
 :deployImage
-%dism% /Apply-Image /ImageFile:%imagepath% /Name:"%imageEdition%" /ApplyDir:%letterOS%:\
+%dism% /Apply-Image /ImageFile:%imagepath% /Index:"%imageIndex%" /ApplyDir:%letterOS%:\
 exit /b
 
 :deployAnswerfile
@@ -448,11 +460,12 @@ exit /b
 :updateImageInfo
 if /i "%imageID%" EQU "X" (
     set image=-------------
-    set imageEdition=-------------
+    set imageIndex=-------------
     set imagepath=
     exit /b
 )
 set image=!image[%imageID%]!
+set imageIndex=1
 set imagepath=%imageLocation%\%arch%\%image%
 exit /b
 
