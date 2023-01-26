@@ -15,7 +15,7 @@ To start using TEAM-Deploy clone or download the repository and populate the `Im
 
 ## 📋 Usage
 
-Execute `TEAM-Deploy.cmd` and use the menu to select the disk, image, answerfile, association file and provisioning package to be used. The script will then format the disk, write the partition table, copy the image to the disk and apply the answerfile, association file and provisioning package. Finally it will create the bootloader.
+Execute `TEAM-Deploy.cmd` with administrative privileges and use the menu to select the disk, image, answerfile, association file and provisioning package to be used. The script will then format the disk, write the partition table, copy the image to the disk and apply the answerfile, association file and provisioning package. Finally it will create the bootloader.
 
 Partitioning, imaging, answerfile deployment, association file deployment and provisioning package deployment can all be enabled/disabled independently.
 
