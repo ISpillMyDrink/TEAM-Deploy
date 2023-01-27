@@ -9,7 +9,7 @@
 </h4>
 
 <p align="center">
-  <img src="./.github/title_image.png" alt="Size Limit CLI" width="738">
+  <img src="./.github/title_animation.gif" alt="Size Limit CLI" width="738">
 </p>
 
 ## 💾 Setup
