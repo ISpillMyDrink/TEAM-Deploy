@@ -35,7 +35,7 @@ cls
 call :writeMenuHeader "Main Menu"
 call :writeMenuEntry "[A] Architecture: %arch%"              "[B] Bootloader: %bootType% / %partitionTable%"
 echo.
-call :writeMenuEntry "[I] Image:        %image%"             "[L] Drive:	  %driveName%"
+call :writeMenuEntry "[I] Image:        %image%"             "[L] Drive:	   %driveName%"
 call :writeMenuEntry "[E] Index:        %imageIndex%"
 call :writeMenuEntry ""                                      "[S] System:     %letterSystem%: %paddedSizeSystem:~-8%"
 call :writeMenuEntry "[U] Answerfile:   %answerfile%"        "    MSR:        -- %paddedSizeMSR:~-8%"
@@ -323,7 +323,7 @@ if "%bootType%" NEQ "----" (
     echo.
     call :createBootloader
     echo.
-    echo. The boot loader was successfully written.
+    echo. The bootloader was successfully written.
 )
 echo.
 if /i "%answerID%" NEQ "X" (

@@ -5,8 +5,12 @@
 </h1>
 
 <h4 align="center">
-  TEAM-Deploy is a simple tool to replace the Windows Setup. It's designed for rapid deployment of Windows in environments such as repair shops.
+  TEAM-Deploy is a simple tool to replace the Windows Setup written entirely in Batch. It's designed for rapid deployment of Windows in environments such as repair shops.
 </h4>
+
+<p align="center">
+  <img src="./.github/title_image.png" alt="Size Limit CLI" width="738">
+</p>
 
 ## 💾 Setup
 
