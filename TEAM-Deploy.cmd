@@ -6,7 +6,8 @@ cd /d %~dp0
 set pathbase=%~dp0
 set configfile=%pathbase%TEAM-Deploy.cfg
 
-set imagelocation=%pathbase%Images
+set moduleLocation=%pathbase%Modules
+set imageLocation=%pathbase%Images
 set answerfileLocation=%pathbase%Answerfiles
 set associationfileLocation=%pathbase%Associationfiles
 set packageLocation=%pathbase%Packages
@@ -23,6 +24,7 @@ call :updateAnswerfileList
 call :updateAnswerfileInfo
 call :updateAssociationfileList
 call :updateAssociationfileInfo
+call :updatePackageList
 call :updatePackageInfo
 call :updatePEBootType
 
@@ -45,9 +47,10 @@ call :writeMenuEntry "[P] Provisioning: %package%"
 echo.
 echo.
 echo. [X] Exit
+echo. [G] Start
 echo.
 set instruction=
-set /P instruction=Please make a selection (enter space to start deployment): 
+set /P instruction=Please make a selection: 
 
 if /i "%instruction%" EQU "X" (
     exit /b
@@ -100,7 +103,7 @@ if /i "%instruction%" EQU "X" (
     goto menuAssociationfileSelection
 ) else if /i "%instruction%" EQU "P" (
     goto menuPackageSelection
-) else if "%instruction%" EQU " " (
+) else if /i "%instruction%" EQU "G" (
     goto menuDeployment
 )
 goto menuMain
@@ -295,7 +298,7 @@ if /I "%partitionTable%" EQU "MBR" goto mbrPart
 
 echo. Partitioning %driveName% as GPT with drive letters %letterSystem%, %letterOS%, %letterRecovery%...
 echo.
-call :partitionGPT %diskID% %sizeSystem% %sizeMSR% %sizeRecovery% %letterSystem% %letterOS% %letterRecovery%
+call %moduleLocation%\Partition_GPT.cmd %diskID% %sizeSystem% %sizeMSR% %sizeRecovery% %letterSystem% %letterOS% %letterRecovery%
 echo.
 echo. Partitioning has finished.
 
@@ -304,7 +307,7 @@ goto continue
 :mbrPart
 echo. Partitioning %driveName% as MBR with drive letters %letterSystem%, %letterOS%, %letterRecovery%...
 echo.
-call :partitionMBR %diskID% %sizeSystem% %sizeRecovery% %letterSystem% %letterOS% %letterRecovery%
+call %moduleLocation%\Partition_MBR.cmd %diskID% %sizeSystem% %sizeRecovery% %letterSystem% %letterOS% %letterRecovery%
 echo.
 echo. Partitioning has finished.
 
@@ -350,45 +353,6 @@ echo. Deployment complete.
 echo.
 pause
 goto menuMain
-
-:partitionGPT
-(echo select disk %1
-echo clean
-echo convert gpt
-echo create partition efi size=%2
-echo format quick fs=fat32 label="System"
-echo assign letter=%5
-echo create partition msr size=%3
-echo create partition primary
-echo shrink minimum=%4
-echo format quick fs=ntfs label="Windows"
-echo assign letter=%6
-echo create partition primary
-echo format quick fs=ntfs label="Recovery"
-echo assign letter=%7
-echo set id="de94bba4-06d1-4d40-a16a-bfd50179d6ac" override
-echo gpt attributes=0x8000000000000001
-) | diskpart
-exit /b
-
-:partitionMBR
-(echo select disk %1
-echo clean
-echo convert mbr
-echo create partition primary size=%2
-echo format quick fs=ntfs label="System"
-echo assign letter=%4
-echo active
-echo create partition primary
-echo shrink minimum=%3
-echo format quick fs=ntfs label="Windows"
-echo assign letter=%5
-echo create partition primary
-echo format quick fs=ntfs label="Recovery"
-echo assign letter=%6
-echo set id=27 override
-) | diskpart
-exit /b
 
 :updatePEBootType
 wpeutil UpdateBootInfo 1>nul 2>nul
