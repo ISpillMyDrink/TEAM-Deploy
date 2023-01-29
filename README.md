@@ -14,11 +14,11 @@
 
 ## 💾 Setup
 
-To start using TEAM-Deploy clone or download the repository and populate the `Images` folder with your WIM or ESD files, the `Answerfiles` folder with your answerfiles, `Associationfiles` folder with your association files and the `Packages` folder with your siloed provisioning packages.
+To start using TEAM-Deploy clone or download the repository and populate the `Images` folder with your WIM or ESD files, the `Answerfiles` folder with your <a href="https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/wsim/answer-files-overview">Answerfiles</a>, `Associationfiles` folder with your <a href="https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/export-or-import-default-application-associations">Associationfiles</a> and the `Packages` folder with your <a href="https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/siloed-provisioning-packages">Siloed provisioning packages</a>.
 
 Note that no path should contain spaces, that includes the path to the repository itself aswell as the names of the image, answerfile, associationfile, and provisioning package files.
 
-Not all versions of DISM support applying siloed provisioning packages. If you want to use provisioning packages you should use the latest version of DISM from the Windows ADK and set the `adkLocation` option in the `TEAM-Deploy.cfg` file to the location of the ADK installation.
+Not all versions of DISM support applying Siloed provisioning packages. If you want to use provisioning packages you should use the latest version of DISM from the Windows ADK and set the `adkLocation` option in the `TEAM-Deploy.cfg` file to the location of the ADK installation.
 
 ## 📋 Usage
 
