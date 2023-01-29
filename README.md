@@ -16,7 +16,7 @@
 
 To start using TEAM-Deploy clone or download the repository and populate the `Images` folder with your WIM or ESD files, the `Answerfiles` folder with your <a href="https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/wsim/answer-files-overview">Answerfiles</a>, `Associationfiles` folder with your <a href="https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/export-or-import-default-application-associations">Associationfiles</a> and the `Packages` folder with your <a href="https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/siloed-provisioning-packages">Siloed provisioning packages</a>.
 
-Note that no path should contain spaces, that includes the path to the repository itself aswell as the names of the image, answerfile, associationfile, and provisioning package files.
+Note that no path should contain spaces, that includes the path to the repository itself aswell as the names of the image files, answerfiles, associationfiles, and provisioning package files.
 
 Not all versions of DISM support applying Siloed provisioning packages. If you want to use provisioning packages you should use the latest version of DISM from the Windows ADK and set the `adkLocation` option in the `TEAM-Deploy.cfg` file to the location of the ADK installation.
 
@@ -24,11 +24,12 @@ Not all versions of DISM support applying Siloed provisioning packages. If you w
 
 Execute `TEAM-Deploy.cmd` with administrative privileges and use the menu to select the disk, image, answerfile, association file and provisioning package to be used. The script will then format the disk, write the partition table, copy the image to the disk and apply the answerfile, association file and provisioning package. Finally it will create the bootloader.
 
-Partitioning, imaging, answerfile deployment, association file deployment and provisioning package deployment can all be enabled/disabled independently.
+Partitioning, image deployment, answerfile deployment, association file deployment, provisioning package deployment, and bootloader creation can all be disabled independently by entering an `X` in the corresponding selection menus.
 
 ## 📝 Configuration
 
-The `TEAM-Deploy.cfg` file contains the configuration for TEAM-Deploy. The following options are available:
+The `TEAM-Deploy.cfg` file contains the configuration for TEAM-Deploy. Some of those settings are default selections and can be changed at runtime, others such as the size of the various partitions are fixed and can only be changed in the configuration file.
+The following options are available:
 * `bootType` - The boot type of the system. Valid values are `UEFI` and `BIOS` (when booted from PE will be overwritten with the current PE boot type).
 * `partitionTable` - The partition table type to be written. Valid values are `GPT` and `MBR`. Choose `GPT` for UEFI systems and `MBR` for BIOS systems (when booted from PE will be overwritten with the partition table type fitting to the boot type).
 * `sizeSystem` - The size of the system partition in MB. The default value is `200`.
