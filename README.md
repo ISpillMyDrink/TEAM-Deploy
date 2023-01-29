@@ -14,8 +14,11 @@
 
 ## 💾 Setup
 
-To start using TEAM-Deploy clone or download the repository and populate the `Images` folder with your WIM or ESD files, the `Answerfiles` folder with your answerfiles, `Associationfiles` folder with your association files and the
-`Packages` folder with your siloed provisioning packages.
+To start using TEAM-Deploy clone or download the repository and populate the `Images` folder with your WIM or ESD files, the `Answerfiles` folder with your answerfiles, `Associationfiles` folder with your association files and the `Packages` folder with your siloed provisioning packages.
+
+Note that no path should contain spaces, that includes the path to the repository itself aswell as the names of the image, answerfile, associationfile, and provisioning package files.
+
+Not all versions of DISM support applying siloed provisioning packages. If you want to use provisioning packages you should use the latest version of DISM from the Windows ADK and set the `adkLocation` option in the `TEAM-Deploy.cfg` file to the location of the ADK installation.
 
 ## 📋 Usage
 
@@ -42,3 +45,7 @@ The `TEAM-Deploy.cfg` file contains the configuration for TEAM-Deploy. The follo
 * `assocID` - The index of the association file to be used. The default value is `1` for the first association file (alphabetically sorted) in the `Associationfiles\<Arch>` folder.
 * `packageID` - The index of the provisioning package to be used. The default value is `1` for the first provisioning package (alphabetically sorted) in the `Packages\<Arch>` folder.
 * `adkLocation` - The location of the ADK installation. The default value is `X:\ADK`. Will be ignored if not found.
+
+## 💵 Credits
+
+Thanks to SelfMan for some of the english translations.

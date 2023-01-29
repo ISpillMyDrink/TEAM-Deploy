@@ -220,7 +220,7 @@ dism /get-imageinfo /imagefile:"%imagepath%"
 echo.
 echo Please enter the image index to deploy.
 set newImageIndex=%imageIndex%
-set /P newImageIndex=Index (%imageIndex%):
+set /P newImageIndex=Index (%imageIndex%): 
 
 echo %newImageIndex%|findstr /r "[1-9]" > nul
 if %errorlevel% EQU 1 goto menuIndexSelection
