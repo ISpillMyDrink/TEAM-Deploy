@@ -28,6 +28,7 @@ call :updatePackageList
 call :updatePackageInfo
 call :updatePEBootType
 
+REM Main Menu
 :menuMain
 set paddedSizeSystem=      (%sizeSystem%MB)
 set paddedSizeMSR=      (%sizeMSR%MB)
@@ -35,16 +36,14 @@ set paddedSizeRecovery=      (%sizeRecovery%MB)
 
 cls
 call :writeMenuHeader "Main Menu"
-call :writeMenuEntry "[A] Architecture: %arch%"              "[B] Bootloader: %bootType% / %partitionTable%"
+call :writeMenuEntry "[A] Architecture: %arch%"            "[L] Drive:	   %driveName%"
+call :writeMenuEntry "[I] Image:        %image%"           "[T] Type:       %partitionTable%"
+call :writeMenuEntry "[E] Index:        %imageIndex%"      "[B] Bootloader: %bootType%"
 echo.
-call :writeMenuEntry "[I] Image:        %image%"             "[L] Drive:	   %driveName%"
-call :writeMenuEntry "[E] Index:        %imageIndex%"
-call :writeMenuEntry ""                                      "[S] System:     %letterSystem%: %paddedSizeSystem:~-8%"
-call :writeMenuEntry "[U] Answerfile:   %answerfile%"        "    MSR:        -- %paddedSizeMSR:~-8%"
-call :writeMenuEntry "[F] Assocfile:    %associationfile%"   "[W] Windows:    %letterOS%:"
-call :writeMenuEntry ""                                      "[R] Recovery:   %letterRecovery%: %paddedSizeRecovery:~-8%"
-call :writeMenuEntry "[P] Provisioning: %package%"
-echo.
+call :writeMenuEntry "[U] Answerfile:   %answerfile%"      "[S] System:     %letterSystem%: %paddedSizeSystem:~-8%"
+call :writeMenuEntry "[F] Assocfile:    %associationfile%" "    MSR:        -- %paddedSizeMSR:~-8%"
+call :writeMenuEntry "[P] Provisioning: %package%"         "[W] Windows:    %letterOS%:"
+call :writeMenuEntry ""                                    "[R] Recovery:   %letterRecovery%: %paddedSizeRecovery:~-8%"
 echo.
 echo. [X] Exit
 echo. [G] Start
@@ -82,16 +81,18 @@ if /i "%instruction%" EQU "X" (
 ) else if /i "%instruction%" EQU "B" (
     if "%bootType%" EQU "UEFI" (
         set bootType=BIOS
-        set partitionTable=MBR
     ) else if "%bootType%" EQU "BIOS" (
         set bootType=ALL
-        set partitionTable=GPT
-    ) else if "%bootType%" EQU "----" (
+    ) else if "%bootType%" EQU "-------------" (
         set bootType=UEFI
-        set partitionTable=GPT
     ) else (
-        set bootType=----
-        set partitionTable=----
+        set bootType=-------------
+    )
+) else if /i "%instruction%" EQU "T" (
+    if "%partitionTable%" EQU "GPT" (
+        set partitionTable=MBR
+    ) else (
+        set partitionTable=GPT
     )
 ) else if /I "%instruction%" EQU "L" (
     goto menuDriveSelection
@@ -108,6 +109,7 @@ if /i "%instruction%" EQU "X" (
 )
 goto menuMain
 
+REM Drive Selection Menu
 :menuDriveSelection
 cls
 call :writeMenuHeader "Drive Selection"
@@ -118,11 +120,12 @@ echo.
 echo.
 echo.
 echo Enter drive number or ^<X^> to disable partitioning.
-set /P diskID=Drive's ID (%diskID%):
+set /P diskID=Drive's ID (%diskID%): 
 
 call :updateDriveInfo
 goto menuMain
 
+REM System Partition Menu
 :menuSystemPartition
 cls
 call :writeMenuHeader "System Partition"
@@ -144,6 +147,7 @@ if %errorlevel% EQU 1 goto menuSystemPartition
 set letterSystem=%newLetterSystem%
 goto menuMain
 
+REM Windows Partition Menu
 :menuWindowsPartition
 cls
 call :writeMenuHeader "Windows Partition"
@@ -164,6 +168,7 @@ if %errorlevel% EQU 1 goto menuWindowsPartition
 set letterOS=%newLetterOS%
 goto menuMain
 
+REM Recovery Partition Menu
 :menuRecoveryPartition
 cls
 call :writeMenuHeader "Recovery Partition"
@@ -185,18 +190,19 @@ if %errorlevel% EQU 1 goto menuRecoveryPartition
 set letterRecovery=%newLetterRecovery%
 goto menuMain
 
+REM Image Menu
 :menuImageSelection
 call :updateImageList
 
 cls
-call :writeMenuHeader "Image selection"
+call :writeMenuHeader "Image Selection"
 for /l %%b in (1,1,%i%) do echo %%b. !image[%%b]!
 echo.
 echo.
 echo.
 echo Please enter the image number or ^<X^> to disable image deployment.
 set newImageID=%imageID%
-set /P newImageID=Image number (%imageID%):
+set /P newImageID=Image number (%imageID%): 
 
 echo %newImageID%|findstr /r "[xX0-9]" > nul
 if %errorlevel% EQU 1 goto menuImageSelection
@@ -205,6 +211,7 @@ set imageID=%newImageID%
 call :updateImageInfo
 goto menuMain
 
+REM Image Index Menu
 :menuIndexSelection
 cls
 call :writeMenuHeader "Index Selection"
@@ -221,16 +228,18 @@ set imageIndex=%newImageIndex%
 
 goto menuMain
 
+REM Answerfile Menu
 :menuAnswerfileSelection
 call :updateAnswerfileList
 
 cls
-call :writeMenuHeader "Answerfile selection"
+call :writeMenuHeader "Answerfile Selection"
 for /l %%b in (1,1,%i%) do echo %%b. !answer[%%b]!
 echo.
 echo.
 echo.
-set /P newAnswerID=Please enter answerfile number or ^<X^> to disable answerfile (%answerID%):
+set newAnswerID=%answerID%
+set /P newAnswerID=Please enter answerfile number or ^<X^> to disable answerfile (%answerID%): 
 
 echo %newAnswerID%|findstr /r "[xX0-9]" > nul
 if %errorlevel% EQU 1 goto menuAnswerfileSelection
@@ -243,12 +252,13 @@ goto menuMain
 call :updateAssociationfileList
 
 cls
-call :writeMenuHeader "Association file selection"
+call :writeMenuHeader "Associationfile Selection"
 for /l %%b in (1,1,%i%) do echo %%b. !assoc[%%b]!
 echo.
 echo.
 echo.
-set /P newAssocID=Please enter the association file number or ^<X^> to disable association file (%assocID%):
+set newAssocID=%assocID%
+set /P newAssocID=Please enter the association file number or ^<X^> to disable association file (%assocID%): 
 
 echo %newAssocID%|findstr /r "[xX0-9]" > nul
 if %errorlevel% EQU 1 goto menuAssociationfileSelection
@@ -261,13 +271,14 @@ goto menuMain
 call :updatePackageList
 
 cls
-call :writeMenuHeader "Package selection"
+call :writeMenuHeader "Provisioning Package Selection"
 for /l %%b in (1,1,%i%) do echo %%b. !package[%%b]!
 echo.
 echo.
 echo.
 echo Please enter the package number or ^<X^> to disable package deployment.
-set /P newPackageID=Package-Nr. (%packageID%):
+set newPackageID=%packageID%
+set /P newPackageID=Package number (%packageID%): 
 
 echo %newPackageID%|findstr /r "[xX0-9]" > nul
 if %errorlevel% EQU 1 goto menuPackageSelection
@@ -277,17 +288,19 @@ call :updatePackageInfo
 
 goto menuMain
 
+REM Deployment Menu
 :menuDeployment
 cls
 call :writeMenuHeader "Deployment"
 if /i "%diskID%" NEQ "X" echo. Drive %driveName% will be formatted as %partitionTable%.
 if /i "%imageID%" NEQ "X" echo. Index %imageIndex% from image %image% will be extracted to %letterOS%:\.
-if /i "%bootType%" NEQ "----" echo. %bootType% bootloader will be created on %letterSystem%:\ with reference to %letterOS%:\Windows.
+if /i "%bootType%" NEQ "-------------" echo. %bootType% bootloader will be created on %letterSystem%:\ with reference to %letterOS%:\Windows.
 if /i "%answerID%" NEQ "X" echo. The answerfile %answerfile% will be applied to %letterOS%:\.
 if /i "%assocID%" NEQ "X" echo. The associationfile %associationfile% will be applied to %letterOS%:\.
 if /i "%packageID%" NEQ "X" echo. Provisioning package %packagefile% will be applied to %letterOS%:\.
 echo.
-set /p safe=Start deployment? (y/n)
+set safe=
+set /p safe=Start deployment? (y/n) 
 if /I "%safe%" EQU "n" goto menuMain
 if /I "%safe%" NEQ "y" goto menuDeployment
 
@@ -316,35 +329,35 @@ echo.
 if /I "%imageID%" NEQ "X" (
     echo. Extracting index %imageIndex% from %image% Image to %letterOS%:\...
     echo.
-    call :deployImage
+    call "%moduleLocation%\Deploy_Image.cmd" %dism% %imagepath% %imageIndex% %letterOS%
     echo.
     echo. The image extraction has finished.
 )
 echo.
-if "%bootType%" NEQ "----" (
+if "%bootType%" NEQ "-------------" (
     echo. Writing %bootType% bootloader to %letterSystem%:\
     echo.
-    call :createBootloader
+    call "%moduleLocation%\Create_Bootloader.cmd" %letterOS% %letterSystem% %bootType%
     echo.
     echo. The bootloader was successfully written.
 )
 echo.
 if /i "%answerID%" NEQ "X" (
     echo. Copying Answer file %answerfile% to %letterOS%:\Windows\Panther...
-    call :deployAnswerfile
+    call "%moduleLocation%\Deploy_Answerfile.cmd" %letterOS% %answerfilePath%
     echo.
     echo. Copying finished.
 )
 echo.
 if /i "%assocID%" NEQ "X" (
     echo. Applying Association file %associationfile%...
-    call :deployAssociationfile
+    call %moduleLocation%\Deploy_Associationfile.cmd %dism% %letterOS% %associationfilePath%
     echo.
     echo Apply finished.
 )
 if /i "%packageID%" NEQ "X" (
     echo. Applying Provisioning Package %package%...
-    call :deployPackage
+    call %moduleLocation%\Deploy_Package.cmd %dism% %letterOS% %packagefilePath%
     echo.
     echo Apply finished.
 )
@@ -354,6 +367,8 @@ echo.
 pause
 goto menuMain
 
+REM updatePEBootType
+REM update the selected boot type and partition table with the current PE boot mode and fitting partition table type
 :updatePEBootType
 wpeutil UpdateBootInfo 1>nul 2>nul
 if %errorlevel% EQU 9009 exit /b
@@ -365,31 +380,8 @@ if %errorlevel% EQU 1 (
 )
 exit /b
 
-:deployImage
-%dism% /Apply-Image /ImageFile:%imagepath% /Index:"%imageIndex%" /ApplyDir:%letterOS%:\
-exit /b
-
-:deployAnswerfile
-if exist %letterOS%:\Windows\Panther (
-    del /s /q %letterOS%:\Windows\Panther\*
-    rmdir /s /q %letterOS%:\Windows\Panther\
-)
-mkdir %letterOS%:\Windows\Panther
-copy /y %answerfilePath% %letterOS%:\Windows\Panther\unattend.xml > nul
-exit /b
-
-:deployAssociationfile
-%dism% /image:%letterOS%:\ /import-defaultappassociations:%associationfilePath%
-exit /b
-
-:deployPackage
-%dism% /apply-siloedpackage /imagepath:%letterOS%:\ /packagepath:%packagePath%
-exit /b
-
-:createBootloader
-%letterOS%:\Windows\System32\bcdboot %letterOS%:\Windows /s %letterSystem%: /f %bootType%
-exit /b
-
+REM updateDriveInfo
+REM updates the UI with information about the selected drive
 :updateDriveInfo
 if /i "%diskID%" EQU "X" (
     set driveName=-------------
@@ -403,6 +395,8 @@ for /f "usebackq skip=8 tokens=*" %%a in (`diskpart /s %temp%\team_deploy_diskpa
 )
 exit /b
 
+REM updateImageList
+REM updates the list of available images
 :updateImageList
 set i=0
 for %%a in (%imageLocation%\%arch%\*.wim %imageLocation%\%arch%\*.esd) do (
@@ -412,15 +406,8 @@ for %%a in (%imageLocation%\%arch%\*.wim %imageLocation%\%arch%\*.esd) do (
 if %i% EQU 0 set imageID=X
 exit /b
 
-:updatePackageList
-set i=0
-for %%a in (%packagelocation%\%arch%\*.spp) do (
-    set /a i=i+1
-    set package[!i!]=%%~na%%~xa
-)
-if %i% EQU 0 set packageID=X
-exit /b
-
+REM updateImageInfo
+REM updates the UI with the currently selected image
 :updateImageInfo
 if /i "%imageID%" EQU "X" (
     set image=-------------
@@ -433,6 +420,8 @@ set imageIndex=1
 set imagepath=%imageLocation%\%arch%\%image%
 exit /b
 
+REM updateAnswerfileList
+REM updates the list of available answerfiles
 :updateAnswerfileList
 set i=0
 for %%a in (%answerfileLocation%\%arch%\*.xml) do (
@@ -442,6 +431,8 @@ for %%a in (%answerfileLocation%\%arch%\*.xml) do (
 if %i% EQU 0 set answerID=X
 exit /b
 
+REM updateAnswerfileInfo
+REM updates the UI with the currently selected answerfile
 :updateAnswerfileInfo
 if /i "%answerID%" EQU "X" (
     set answerfile=-------------
@@ -452,6 +443,8 @@ set answerfile=!answer[%answerID%]!
 set answerfilePath=%answerfileLocation%\%arch%\%answerfile%
 exit /b
 
+REM updateAssociationfileList
+REM updates the list of available associationfiles
 :updateAssociationfileList
 set i=0
 for %%a in (%associationfileLocation%\%arch%\*.xml) do (
@@ -461,6 +454,8 @@ for %%a in (%associationfileLocation%\%arch%\*.xml) do (
 if %i% EQU 0 set assocID=X
 exit /b
 
+REM updateAssociationfileInfo
+REM updates the UI with the currently selected associationfile
 :updateAssociationfileInfo
 if /i "%assocID%" EQU "X" (
     set associationfile=-------------
@@ -471,6 +466,19 @@ set associationfile=!assoc[%assocID%]!
 set associationfilePath=%associationfileLocation%\%arch%\%associationfile%
 exit /b
 
+REM updatePackageList
+REM updates the list of available siloed provisioning packages
+:updatePackageList
+set i=0
+for %%a in (%packagelocation%\%arch%\*.spp) do (
+    set /a i=i+1
+    set package[!i!]=%%~na%%~xa
+)
+if %i% EQU 0 set packageID=X
+exit /b
+
+REM updatePackageInfo
+REM updates the UI with the currently selected package
 :updatePackageInfo
 if /i "%packageID%" EQU "X" (
     set package=-------------
@@ -481,12 +489,16 @@ set package=!package[%packageID%]!
 set packagePath=%packageLocation%\%arch%\%package%
 exit /b
 
+REM writeMenuHeader [title]
+REM writes the default menu header
 :writeMenuHeader
 echo.
 echo.     TEAM-Computer Deployment Tool - %~1
 echo.
 exit /b
 
+REM writeMenuEntry [left] [right]
+REM writes a menu entry with two columns
 :writeMenuEntry
 set l=%~1                                                       
 set r=%~2                                                       
