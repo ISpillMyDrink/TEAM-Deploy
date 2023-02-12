@@ -35,7 +35,7 @@ set paddedSizeRecovery=      (%sizeRecovery%MB)
 
 cls
 call :writeMenuHeader "Main Menu"
-call :writeMenuEntry "[A] Architecture: %arch%"            "[L] Drive:	   %driveName%"
+call :writeMenuEntry "[A] Architecture: %arch%"            "[L] Drive:    %driveName%"
 call :writeMenuEntry "[I] Image:        %image%"           "[T] Type:       %partitionTable%"
 call :writeMenuEntry "[E] Index:        %imageIndex%"      "[B] Bootloader: %bootType%"
 echo.
