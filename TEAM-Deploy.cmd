@@ -28,7 +28,6 @@ call :updatePackageList
 call :updatePackageInfo
 call :updatePEBootType
 
-REM Main Menu
 :menuMain
 set paddedSizeSystem=      (%sizeSystem%MB)
 set paddedSizeMSR=      (%sizeMSR%MB)
@@ -109,7 +108,6 @@ if /i "%instruction%" EQU "X" (
 )
 goto menuMain
 
-REM Drive Selection Menu
 :menuDriveSelection
 cls
 call :writeMenuHeader "Drive Selection"
@@ -125,7 +123,6 @@ set /P diskID=Drive's ID (%diskID%):
 call :updateDriveInfo
 goto menuMain
 
-REM System Partition Menu
 :menuSystemPartition
 cls
 call :writeMenuHeader "System Partition"
@@ -147,7 +144,6 @@ if %errorlevel% EQU 1 goto menuSystemPartition
 set letterSystem=%newLetterSystem%
 goto menuMain
 
-REM Windows Partition Menu
 :menuWindowsPartition
 cls
 call :writeMenuHeader "Windows Partition"
@@ -168,7 +164,6 @@ if %errorlevel% EQU 1 goto menuWindowsPartition
 set letterOS=%newLetterOS%
 goto menuMain
 
-REM Recovery Partition Menu
 :menuRecoveryPartition
 cls
 call :writeMenuHeader "Recovery Partition"
@@ -190,7 +185,6 @@ if %errorlevel% EQU 1 goto menuRecoveryPartition
 set letterRecovery=%newLetterRecovery%
 goto menuMain
 
-REM Image Menu
 :menuImageSelection
 call :updateImageList
 
@@ -211,7 +205,6 @@ set imageID=%newImageID%
 call :updateImageInfo
 goto menuMain
 
-REM Image Index Menu
 :menuIndexSelection
 cls
 call :writeMenuHeader "Index Selection"
@@ -228,7 +221,6 @@ set imageIndex=%newImageIndex%
 
 goto menuMain
 
-REM Answerfile Menu
 :menuAnswerfileSelection
 call :updateAnswerfileList
 
@@ -288,7 +280,6 @@ call :updatePackageInfo
 
 goto menuMain
 
-REM Deployment Menu
 :menuDeployment
 cls
 call :writeMenuHeader "Deployment"
@@ -367,8 +358,6 @@ echo.
 pause
 goto menuMain
 
-REM updatePEBootType
-REM update the selected boot type and partition table with the current PE boot mode and fitting partition table type
 :updatePEBootType
 wpeutil UpdateBootInfo 1>nul 2>nul
 if %errorlevel% EQU 9009 exit /b
@@ -380,8 +369,6 @@ if %errorlevel% EQU 1 (
 )
 exit /b
 
-REM updateDriveInfo
-REM updates the UI with information about the selected drive
 :updateDriveInfo
 if /i "%diskID%" EQU "X" (
     set driveName=-------------
@@ -395,8 +382,6 @@ for /f "usebackq skip=8 tokens=*" %%a in (`diskpart /s %temp%\team_deploy_diskpa
 )
 exit /b
 
-REM updateImageList
-REM updates the list of available images
 :updateImageList
 set i=0
 for %%a in (%imageLocation%\%arch%\*.wim %imageLocation%\%arch%\*.esd) do (
@@ -406,8 +391,6 @@ for %%a in (%imageLocation%\%arch%\*.wim %imageLocation%\%arch%\*.esd) do (
 if %i% EQU 0 set imageID=X
 exit /b
 
-REM updateImageInfo
-REM updates the UI with the currently selected image
 :updateImageInfo
 if /i "%imageID%" EQU "X" (
     set image=-------------
@@ -420,8 +403,6 @@ set imageIndex=1
 set imagepath=%imageLocation%\%arch%\%image%
 exit /b
 
-REM updateAnswerfileList
-REM updates the list of available answerfiles
 :updateAnswerfileList
 set i=0
 for %%a in (%answerfileLocation%\%arch%\*.xml) do (
@@ -431,8 +412,6 @@ for %%a in (%answerfileLocation%\%arch%\*.xml) do (
 if %i% EQU 0 set answerID=X
 exit /b
 
-REM updateAnswerfileInfo
-REM updates the UI with the currently selected answerfile
 :updateAnswerfileInfo
 if /i "%answerID%" EQU "X" (
     set answerfile=-------------
@@ -443,8 +422,6 @@ set answerfile=!answer[%answerID%]!
 set answerfilePath=%answerfileLocation%\%arch%\%answerfile%
 exit /b
 
-REM updateAssociationfileList
-REM updates the list of available associationfiles
 :updateAssociationfileList
 set i=0
 for %%a in (%associationfileLocation%\%arch%\*.xml) do (
@@ -454,8 +431,6 @@ for %%a in (%associationfileLocation%\%arch%\*.xml) do (
 if %i% EQU 0 set assocID=X
 exit /b
 
-REM updateAssociationfileInfo
-REM updates the UI with the currently selected associationfile
 :updateAssociationfileInfo
 if /i "%assocID%" EQU "X" (
     set associationfile=-------------
@@ -466,8 +441,6 @@ set associationfile=!assoc[%assocID%]!
 set associationfilePath=%associationfileLocation%\%arch%\%associationfile%
 exit /b
 
-REM updatePackageList
-REM updates the list of available siloed provisioning packages
 :updatePackageList
 set i=0
 for %%a in (%packagelocation%\%arch%\*.spp) do (
@@ -477,8 +450,6 @@ for %%a in (%packagelocation%\%arch%\*.spp) do (
 if %i% EQU 0 set packageID=X
 exit /b
 
-REM updatePackageInfo
-REM updates the UI with the currently selected package
 :updatePackageInfo
 if /i "%packageID%" EQU "X" (
     set package=-------------
@@ -489,16 +460,12 @@ set package=!package[%packageID%]!
 set packagePath=%packageLocation%\%arch%\%package%
 exit /b
 
-REM writeMenuHeader [title]
-REM writes the default menu header
 :writeMenuHeader
 echo.
 echo.     TEAM-Computer Deployment Tool - %~1
 echo.
 exit /b
 
-REM writeMenuEntry [left] [right]
-REM writes a menu entry with two columns
 :writeMenuEntry
 set l=%~1                                                       
 set r=%~2                                                       
